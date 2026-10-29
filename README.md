@@ -92,6 +92,17 @@ Marketplace data and the current role are stored in browser `localStorage`. Unfi
 
 This project does not provide real accounts, server-side data storage, reservations, or payments. Booking requests are local demo records and should not be treated as confirmed rentals.
 
+## Possible future improvements
+
+- Add a backend API and database for shared users, vehicles, favorites, and bookings.
+- Implement secure authentication, account management, and server-side role permissions.
+- Track vehicle availability by date and prevent overlapping booking requests.
+- Add booking status notifications and owner-customer messaging.
+- Store uploaded vehicle photos in cloud storage and support image management.
+- Integrate a payment provider for deposits and rental payments.
+- Add automated unit, integration, and end-to-end tests.
+- Improve accessibility and add more language and currency options.
+
 ## Available scripts
 
 ### `npm run dev`
