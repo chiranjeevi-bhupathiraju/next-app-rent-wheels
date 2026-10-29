@@ -25,6 +25,14 @@ RentWheels is a responsive vehicle rental marketplace for exploring and managing
 - Tailwind CSS
 - Lucide React icons
 
+## Next.js concepts used
+
+- **App Router and file-based routing:** `app/[[...slug]]/page.jsx` uses an optional catch-all route to accept paths such as `/`, `/vehicles`, `/vehicles/:id`, and role dashboards.
+- **Route and query parameters:** The async route page reads Next.js `params` and `searchParams`, then passes the path and query string to the marketplace for screen selection and filtering.
+- **Server and Client Components:** The route page and root layout run as Server Components by default. `src/Marketplace.jsx` and interactive screens are Client Components because they use React state and effects, browser storage, and form interactions.
+- **Root layout and metadata:** `app/layout.jsx` defines the shared HTML document, imports global styles, and exports page metadata for the application.
+- **Global styling:** `app/globals.css` loads Tailwind layers and defines shared base styles used across routes.
+
 ## Prerequisites
 
 - Node.js 20.9 or later
