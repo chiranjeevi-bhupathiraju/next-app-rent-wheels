@@ -1,4 +1,4 @@
-# RentWheels
+# RentWheels (next-app-rent-wheels)
 
 RentWheels is a frontend-only vehicle rental marketplace portfolio project built with the Next.js App Router, JavaScript, Tailwind CSS, and Lucide React. The app uses seeded Indian vehicle listings priced in INR and browser `localStorage`; it does not use a backend or real authentication.
 
