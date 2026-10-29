@@ -1,6 +1,6 @@
 "use client";
 import { useState } from 'react';
-import { ArrowRight, CarFront, ChevronDown, Menu, X } from 'lucide-react';
+import { ArrowRight, CarFront, ChevronDown, LogOut, Menu, X } from 'lucide-react';
 import { write } from '../store';
 import { imageFallback, money } from '../utils';
 function Image({ src, alt, className = "" }) {
@@ -34,7 +34,7 @@ function Price({ value, suffix = "/ day" }) {
     </span>
   );
 }
-function Header({ role, setRole, path = "/", query = "" }) {
+function Header({ role, path = "/", query = "" }) {
   const [open, setOpen] = useState(false),
     [mobile, setMobile] = useState(false);
   const currentCategory = new URLSearchParams(query).get("category");
@@ -56,10 +56,13 @@ function Header({ role, setRole, path = "/", query = "" }) {
         : [["Home", "/"], ["Browse vehicles", "/vehicles"], ["Cars", "/vehicles?category=Cars%20%26%20SUVs"], ["Bikes", "/vehicles?category=Bikes%20%26%20Scooters"], ["Mini buses", "/vehicles?category=Mini%20Buses"], ["List your vehicle", "/list-vehicle"]];
   const goRole = (r) => {
     write("role", r);
-    setRole(r);
     setOpen(false);
     setMobile(false);
     window.location.href = `/${r.toLowerCase()}/dashboard`;
+  };
+  const logout = () => {
+    write("role", null);
+    window.location.href = "/";
   };
   return (
     <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/90 shadow-sm shadow-slate-900/[0.03] backdrop-blur-xl">
@@ -77,31 +80,31 @@ function Header({ role, setRole, path = "/", query = "" }) {
           })}
         </nav>
         <div className="flex items-center gap-2">
-          <div className="relative">
+          {role ? <div className="relative">
             <button
               type="button"
               aria-expanded={open}
               className="inline-flex min-h-10 min-w-[10.5rem] items-center justify-between gap-2 rounded-xl border border-slate-200 bg-white px-3.5 text-sm font-semibold text-slate-700 transition hover:border-indigo-200 hover:bg-indigo-50"
               onClick={() => setOpen((current) => !current)}
             >
-              Demo account
+              {`Demo ${role}`}
               <ChevronDown size={15} />
             </button>
             {open && (
               <div className="absolute right-0 top-[calc(100%+10px)] z-40 min-w-[13rem] rounded-2xl border border-slate-200 bg-white p-2 shadow-xl shadow-slate-900/10">
-                <div className="px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">Switch demo view</div>
+                <div className="px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">Choose a demo role</div>
                 {["Customer", "Owner", "Admin"].map((r) => (
                   <button className="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-sm font-medium text-slate-700 transition hover:bg-indigo-50 hover:text-indigo-700" key={r} aria-pressed={role === r} onClick={() => goRole(r)}>
                     {r}
                     <ArrowRight size={14} />
                   </button>
                 ))}
-                <a className="flex w-full rounded-xl px-3 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-indigo-50 hover:text-indigo-700" href="/login" onClick={() => { setOpen(false); setMobile(false); }}>
-                  Demo login
-                </a>
+                {role && <button className="mt-1 flex w-full items-center gap-2 rounded-xl border-t border-slate-100 px-3 py-3 text-left text-sm font-semibold text-rose-600 transition hover:bg-rose-50" onClick={logout}>
+                  <LogOut size={15} /> Log out
+                </button>}
               </div>
             )}
-          </div>
+          </div> : <a className="inline-flex min-h-10 items-center justify-center rounded-xl bg-indigo-600 px-4 text-sm font-semibold text-white shadow-md shadow-indigo-600/15 transition hover:bg-indigo-700" href="/login">Log in</a>}
           <button
             className="grid h-10 w-10 place-items-center rounded-xl border border-slate-200 bg-white text-slate-700 lg:hidden"
             aria-label="Toggle navigation"

@@ -1,6 +1,6 @@
 "use client";
 import { useState } from 'react';
-import { ArrowRight, CarFront, Clock3, Users, ShieldCheck, LayoutDashboard, ListChecks, Settings, LogOut, RotateCcw } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Activity, CarFront, Clock3, Users, ShieldCheck, LayoutDashboard, ListChecks, Settings, LogOut, RotateCcw, Sparkles } from 'lucide-react';
 import { Badge, Empty, PageHead, Stat } from '../components/MarketplaceUI';
 import BookingTable from '../components/BookingTable';
 import AdminVehicleTable from '../components/AdminVehicleTable';
@@ -37,23 +37,52 @@ export function Admin({
   ];
   return (
     <main className="mx-auto max-w-7xl px-4 py-9 sm:px-6 sm:py-14">
-      <div className="mb-8 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
-        <div>
-          <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.16em] text-indigo-600">ADMIN DEMO DASHBOARD</div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-slate-950 sm:text-4xl">Marketplace overview</h1>
-          <p className="mt-2 text-sm text-slate-500">Manage this local portfolio demo.</p>
+      <section className="relative mb-8 overflow-hidden rounded-[2rem] bg-gradient-to-br from-slate-950 via-indigo-950 to-violet-950 text-white shadow-2xl shadow-indigo-950/20">
+        <div className="absolute -right-20 -top-40 h-96 w-96 rounded-full border border-white/10" />
+        <div className="absolute right-10 -top-28 h-72 w-72 rounded-full border border-white/10" />
+        <div className="relative grid gap-8 p-6 sm:p-9 lg:grid-cols-[1fr_360px] lg:items-end lg:p-12">
+          <div className="max-w-2xl">
+            <div className="mb-5 inline-flex items-center gap-2 rounded-full bg-violet-300/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-violet-200 ring-1 ring-inset ring-violet-200/20">
+              <Sparkles size={13} /> Admin control room
+            </div>
+            <h1 className="max-w-xl text-3xl font-black leading-[1.06] tracking-[-0.04em] sm:text-5xl">Keep every ride moving.</h1>
+            <p className="mt-4 max-w-lg text-sm leading-6 text-white/65 sm:text-base">A clear view of the marketplace, the people in it, and the listings that need your attention.</p>
+            <div className="mt-7 flex flex-wrap gap-3">
+              <button className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-white px-5 text-sm font-bold text-indigo-950 shadow-lg transition hover:-translate-y-0.5 hover:bg-indigo-50" onClick={() => setTab("vehicles")}>
+                <CarFront size={17} /> Review listings <ArrowUpRight size={16} />
+              </button>
+              <button className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-5 text-sm font-semibold text-white transition hover:bg-white/10" onClick={() => setTab("bookings")}>
+                <ListChecks size={16} /> View bookings
+              </button>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-2">
+            {[
+              ["Vehicles", vehicles.length, CarFront],
+              ["People", users.length, Users],
+              ["Requests", bookings.length, ListChecks],
+              ["Need review", vehicles.filter((v) => v.approval === "Pending").length, Clock3],
+            ].map(([label, value, Icon]) => (
+              <div key={label} className="rounded-2xl border border-white/10 bg-white/[0.07] p-4 backdrop-blur-sm">
+                <div className="flex items-center justify-between text-white/55"><span className="text-xs font-medium">{label}</span><Icon size={15} /></div>
+                <div className="mt-3 text-2xl font-extrabold tracking-tight text-white">{value}</div>
+                <div className="mt-1 flex items-center gap-1 text-[10px] text-emerald-200"><Activity size={11} /> Local demo data</div>
+              </div>
+            ))}
+          </div>
         </div>
         <button
-          className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:border-indigo-200 hover:bg-indigo-50"
+          aria-label="Log out"
+          title="Log out"
+          className="absolute right-5 top-5 inline-flex h-9 items-center gap-2 rounded-full border border-white/15 bg-black/10 px-3 text-[11px] font-semibold text-white/75 transition hover:bg-white/10 hover:text-white sm:right-8 sm:top-7"
           onClick={() => {
             write("role", null);
-            window.location.href = "/login";
+            window.location.href = "/";
           }}
         >
-          <LogOut size={16} />
-          Switch role
+          <LogOut size={14} /> Log out
         </button>
-      </div>
+      </section>
       <div className="grid items-start gap-6 lg:grid-cols-[230px_minmax(0,1fr)]">
         <aside className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
           <div className="mb-4 flex items-center gap-3 border-b border-slate-100 pb-4">
