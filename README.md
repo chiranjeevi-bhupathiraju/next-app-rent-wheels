@@ -1,22 +1,90 @@
-# RentWheels (next-app-rent-wheels)
+# RentWheels
 
-RentWheels is a frontend-only vehicle rental marketplace portfolio project built with the Next.js App Router, JavaScript, Tailwind CSS, and Lucide React. The app uses seeded Indian vehicle listings priced in INR and browser `localStorage`; it does not use a backend or real authentication.
+RentWheels is a frontend vehicle rental marketplace demo. Browse vehicles, submit booking requests, and explore customer, owner, and admin views. The app uses sample listings in INR and stores demo data in your browser; it does not use a backend or provide real authentication or payments.
 
-## Run locally
+## Features
 
-```bash
-npm install
-npm run dev
+- Browse and search vehicle listings by location, category, price, and availability
+- View vehicle details and save favorite vehicles
+- Submit and manage demo booking requests
+- Create, edit, and delete owner vehicle listings
+- Upload at least three vehicle photos for new or edited listings
+- Review listings, bookings, and demo users in the admin view
+- Responsive layouts styled with Tailwind CSS
+
+## Tech stack
+
+- Next.js App Router
+- React 19
+- Tailwind CSS
+- React Hook Form and Zod
+- Lucide React icons
+
+## Prerequisites
+
+- Node.js 20.9 or later
+- npm
+
+## Getting started
+
+1. Clone the repository and move into the project directory:
+
+   ```bash
+   git clone https://github.com/chiranjeevi-bhupathiraju/next-app-rent-wheels.git
+   cd next-app-rent-wheels
+   ```
+
+2. Install the dependencies:
+
+   ```bash
+   npm install
+   ```
+
+3. Start the development server:
+
+   ```bash
+   npm run dev
+   ```
+
+   Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Usage
+
+1. Browse vehicles from the home page or open **Explore vehicles**.
+2. Search and filter by location, category, price, or availability.
+3. Open a listing to view its details, save it as a favorite, or submit a demo booking request.
+4. Use **Demo account** in the header or visit `/login` to switch between Customer, Owner, and Admin views.
+5. In the Owner view, manage listings and booking requests from `/owner/dashboard`.
+6. In the Admin view, review listings, bookings, and demo user statuses.
+
+Changes are saved in browser `localStorage` and are cleared if the app's demo data is reset or browser storage is removed. The role selector is for demonstration only. Booking requests do not create real reservations or process payments.
+
+## Available scripts
+
+### `npm run dev`
+
+Starts the Next.js development server with live reloading.
+
+### `npm run build`
+
+Creates an optimized production build.
+
+### `npm start`
+
+Starts the production server. Run `npm run build` first.
+
+## Project structure
+
+```text
+app/
+  [[...slug]]/page.jsx   Route entry point for marketplace pages
+  globals.css            Global styles and Tailwind directives
+  layout.jsx             Root app layout
+src/
+  components/            Vehicle cards, editors, tables, and shared UI
+  screens/               Home, browse, login, dashboard, admin, and detail views
+  data.js                Seeded demo listings and marketplace data
+  Marketplace.jsx        Marketplace state and page composition
+  store.js               Browser localStorage helpers
+  utils.js               Formatting and date utilities
 ```
-
-Open [http://localhost:3000](http://localhost:3000).
-
-## Demo views
-
-- Use **Demo account** in the header or visit `/login` to switch between Customer, Owner, and Admin views.
-- Browse vehicles, search and filter, favorite listings, and submit booking requests.
-- Owners can add, edit, and delete demo listings from `/owner/dashboard`.
-- New and edited listings require at least three uploaded vehicle photos. Images are resized and saved in local browser storage.
-- Admins can manage seeded user statuses, review pending listings, filter bookings, and reset demo data.
-
-Data is stored in this browser only. The role selector is for demonstration and does not provide authentication or security. Booking totals are estimates; no payments or real bookings are processed. Vehicle and testimonial content is sample portfolio data.
