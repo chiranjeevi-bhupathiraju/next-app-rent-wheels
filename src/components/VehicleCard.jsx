@@ -2,12 +2,14 @@
 import { Fuel, Heart, MapPin, Star, Users } from 'lucide-react';
 import { Image, Price } from './MarketplaceUI';
 function VehicleCard({ v, favorite, onFavorite }) {
+  const isAvailable = v.available !== false;
   return (
     <article className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl">
       <a className="relative block h-56 overflow-hidden bg-slate-100" href={`/vehicles/${v.id}`}>
         <Image src={v.image} alt={v.name} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
-        <span className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/95 px-3 py-1.5 text-xs font-semibold text-emerald-700 shadow-sm">
-          <i className="h-1.5 w-1.5 rounded-full bg-emerald-500" />Available
+        <span className={`absolute left-4 top-4 inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/95 px-3 py-1.5 text-xs font-semibold shadow-sm ${isAvailable ? "text-emerald-700" : "text-amber-700"}`}>
+          <i className={`h-1.5 w-1.5 rounded-full ${isAvailable ? "bg-emerald-500" : "bg-amber-500"}`} />
+          {isAvailable ? "Available" : "Unavailable"}
         </span>
       </a>
       <button

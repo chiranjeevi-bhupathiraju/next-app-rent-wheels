@@ -67,6 +67,7 @@ export function Details({ id, vehicles, bookings, saveBookings, notify, role }) 
         />
       </main>
     );
+  const isAvailable = v.available !== false;
   const images = v.images?.length ? v.images : [v.image];
   const selectedImageIndex = activeImage.vehicleId === v.id
     ? Math.min(activeImage.index, images.length - 1)
@@ -74,6 +75,10 @@ export function Details({ id, vehicles, bookings, saveBookings, notify, role }) 
   const selectedImage = images[selectedImageIndex];
   const submit = (e) => {
     e.preventDefault();
+    if (!isAvailable) {
+      notify("This vehicle is currently unavailable for booking.");
+      return;
+    }
     const nextErrors = {};
     const todayDate = new Date(`${today}T00:00:00`);
     const pickupDate = pickup ? new Date(`${pickup}T00:00:00`) : null;
@@ -193,7 +198,9 @@ export function Details({ id, vehicles, bookings, saveBookings, notify, role }) 
               <h3 className="mt-0.5 font-bold text-slate-900">{v.owner || "RentWheels owner"}</h3>
               <p className="text-xs text-slate-500">Demo vehicle owner</p>
             </div>
-            <Badge tone="available">Available</Badge>
+            <Badge tone={isAvailable ? "available" : "warning"}>
+              {isAvailable ? "Available" : "Unavailable"}
+            </Badge>
           </div>
           <div className="py-6">
             <h2 className="text-lg font-bold text-slate-900">Rental notes</h2>
@@ -218,6 +225,11 @@ export function Details({ id, vehicles, bookings, saveBookings, notify, role }) 
             <small className="pt-1 text-xs text-slate-500">per day</small>
           </div>
           <form onSubmit={submit} noValidate className="space-y-4">
+            {!isAvailable && (
+              <p className="rounded-xl border border-amber-200 bg-amber-50 px-3.5 py-3 text-sm font-medium text-amber-800" role="status">
+                This vehicle is currently unavailable for booking.
+              </p>
+            )}
             <div className="grid grid-cols-2 gap-3">
               <label className="flex min-w-0 flex-col gap-2">
                 <span className="text-xs font-semibold text-slate-700">Pickup date</span>
@@ -308,10 +320,11 @@ export function Details({ id, vehicles, bookings, saveBookings, notify, role }) 
               <b className="text-base font-bold text-slate-900">{money(total)}</b>
             </div>
             <button
-              className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 text-sm font-semibold text-white shadow-md shadow-indigo-600/20 transition hover:bg-indigo-700"
+              className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 text-sm font-semibold text-white shadow-md shadow-indigo-600/20 transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none"
               type="submit"
+              disabled={!isAvailable}
             >
-              Request booking <ArrowRight size={17} />
+              {isAvailable ? "Request booking" : "Unavailable"} {isAvailable && <ArrowRight size={17} />}
             </button>
             <div className="flex items-center justify-center gap-2 text-center text-[11px] text-slate-500">
               <ShieldCheck size={15} />
