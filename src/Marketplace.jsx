@@ -33,26 +33,27 @@ export default function Marketplace({ path, query }) {
     setRole(["Customer", "Owner", "Admin"].includes(savedRole) ? savedRole : null);
     setRoleReady(true);
   }, []);
-  const roleRoots = ["customer", "owner", "admin"];
-  const allowedRoute = role
-    ? segment[0] === "login" || (
-        role === "Admin"
-          ? segment[0] === "admin"
-          : role === "Customer"
-            ? ["customer", "vehicles"].includes(segment[0])
-            : ["owner", "list-vehicle"].includes(segment[0])
-      )
-    : segment[0] === "login" || !roleRoots.includes(segment[0]);
-  const roleHome = role === "Admin"
-    ? "/admin/dashboard"
-    : role === "Customer"
-      ? "/vehicles"
-      : "/owner/dashboard";
+  const routeRole = segment[0] === "customer"
+    ? "Customer"
+    : segment[0] === "owner" || segment[0] === "list-vehicle"
+      ? "Owner"
+      : segment[0] === "admin"
+        ? "Admin"
+        : null;
+  const allowedRoute = segment[0] === "login" || !routeRole || role === routeRole || (segment[0] === "list-vehicle" && !role);
   useEffect(() => {
     if (roleReady && !allowedRoute) {
-      window.location.replace(role ? roleHome : "/login");
+      const next = `${path}${query ? `?${query}` : ""}`;
+      if (role) {
+        write("role", routeRole);
+        window.location.replace(next);
+      } else {
+        window.location.replace(
+          `/login?role=${routeRole}&next=${encodeURIComponent(next)}`,
+        );
+      }
     }
-  }, [roleReady, allowedRoute, role, roleHome]);
+  }, [roleReady, allowedRoute, path, query, role, routeRole]);
   const notify = (msg) => {
     setToast(msg);
     setTimeout(() => setToast(""), 2800);
@@ -81,7 +82,7 @@ export default function Marketplace({ path, query }) {
   }
   return (
     <>
-      <Header role={role} setRole={setRole} path={path} query={query} />
+      <Header role={role} path={path} query={query} />
       {segment[0] === "vehicles" && segment[1] ? (
         <VehicleDetailPage
           id={segment[1]}
@@ -89,6 +90,7 @@ export default function Marketplace({ path, query }) {
           bookings={bookings}
           saveBookings={saveBookings}
           notify={notify}
+          role={role}
         />
       ) : segment[0] === "vehicles" ? (
         <BrowsePage
@@ -105,6 +107,7 @@ export default function Marketplace({ path, query }) {
           vehicles={vehicles}
           saveVehicles={saveVehicles}
           notify={notify}
+          role={role}
         />
       ) : segment[0] === "customer" ? (
         <DashboardPage

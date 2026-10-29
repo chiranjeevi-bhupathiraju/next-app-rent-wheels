@@ -1,9 +1,26 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowRight, Plus, X } from "lucide-react";
 import { Image } from "./MarketplaceUI";
 import { categories as baseCategories } from "../data";
 import { compressImage } from "../utils";
+
+const draftKey = "rw_vehicle_form_draft";
+const blankForm = () => ({
+  name: "",
+  make: "",
+  model: "",
+  category: "Cars & SUVs",
+  description: "",
+  location: "",
+  price: "",
+  seats: "5",
+  transmission: "Automatic",
+  fuel: "Gasoline",
+  images: [],
+  available: true,
+});
+
 export default function VehicleEditor({
   mode = "new",
   vehicle,
@@ -11,23 +28,9 @@ export default function VehicleEditor({
   saveVehicles,
   notify,
   onCancel,
+  role,
 }) {
-  const [form, setForm] = useState(
-    vehicle || {
-      name: "",
-      make: "",
-      model: "",
-      category: "Cars & SUVs",
-      description: "",
-      location: "",
-      price: "",
-      seats: "5",
-      transmission: "Automatic",
-      fuel: "Gasoline",
-      images: [],
-      available: true,
-    },
-  );
+  const [form, setForm] = useState(vehicle || blankForm());
   const [errors, setErrors] = useState({});
   const [savedImages, setSavedImages] = useState(
     vehicle?.images || (vehicle?.image ? [vehicle.image] : []),
@@ -35,6 +38,26 @@ export default function VehicleEditor({
   const [newImages, setNewImages] = useState([]);
   const [imageError, setImageError] = useState("");
   const [processingImages, setProcessingImages] = useState(false);
+  const [draftReady, setDraftReady] = useState(mode !== "new");
+  useEffect(() => {
+    if (mode !== "new") {
+      setDraftReady(true);
+      return;
+    }
+    try {
+      const saved = sessionStorage.getItem(draftKey);
+      if (saved) {
+        const draft = JSON.parse(saved);
+        setForm({ ...blankForm(), ...draft.form });
+        setSavedImages(draft.savedImages || []);
+        setNewImages(draft.newImages || []);
+      }
+    } catch {
+      setImageError("We couldn't restore your saved form draft. Please re-enter the details.");
+    } finally {
+      setDraftReady(true);
+    }
+  }, [mode]);
   const update = (key, value) => setForm({ ...form, [key]: value });
   const addImages = async (event) => {
     const files = Array.from(event.target.files || []);
@@ -67,6 +90,7 @@ export default function VehicleEditor({
   };
   const save = (e) => {
     e.preventDefault();
+    if (!draftReady) return;
     const nextErrors = {};
     if (!form.name.trim()) nextErrors.name = "Vehicle name is required.";
     if (!form.make.trim()) nextErrors.make = "Make is required.";
@@ -82,6 +106,19 @@ export default function VehicleEditor({
       nextErrors.category = "Choose a category.";
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length) return;
+    if (mode === "new" && role !== "Owner") {
+      try {
+        sessionStorage.setItem(
+          draftKey,
+          JSON.stringify({ form, savedImages, newImages }),
+        );
+      } catch {
+        setImageError("Your draft is too large to save. Remove a photo and try again.");
+        return;
+      }
+      window.location.href = `/login?role=Owner&next=${encodeURIComponent("/list-vehicle")}`;
+      return;
+    }
     const images = [...savedImages, ...newImages];
     const item = {
       ...form,
@@ -104,6 +141,12 @@ export default function VehicleEditor({
     notify(
       mode === "edit" ? "Vehicle listing updated." : "Vehicle listing saved.",
     );
+    if (mode === "new") {
+      sessionStorage.removeItem(draftKey);
+      setForm(blankForm());
+      setSavedImages([]);
+      setNewImages([]);
+    }
     if (onCancel) onCancel();
     else window.location.href = "/owner/dashboard";
   };
@@ -146,6 +189,11 @@ export default function VehicleEditor({
   return (
     <main className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 sm:py-14">
       <form className="mx-auto max-w-4xl rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-8" onSubmit={save} noValidate>
+      {mode === "new" && role !== "Owner" && (
+        <div className="mb-6 rounded-xl border border-indigo-100 bg-indigo-50/70 px-4 py-3 text-sm leading-6 text-indigo-900">
+          Fill in your vehicle details first. When you select <b>Add vehicle</b>, you’ll sign in as an Owner and your draft will be restored.
+        </div>
+      )}
       <div className="grid grid-cols-1 gap-x-6 gap-y-5 md:grid-cols-2">
         {field("name", "Vehicle name", {
           required: true,
@@ -265,8 +313,12 @@ export default function VehicleEditor({
         >
           Cancel
         </button>
-        <button type="submit" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 text-sm font-semibold text-white shadow-md shadow-indigo-600/20 transition hover:bg-indigo-700">
-          {mode === "edit" ? "Save changes" : "Add vehicle"}{" "}
+        <button
+          type="submit"
+          disabled={!draftReady || processingImages}
+          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 text-sm font-semibold text-white shadow-md shadow-indigo-600/20 transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {mode === "edit" ? "Save changes" : processingImages ? "Preparing photos..." : !draftReady ? "Restoring draft..." : "Add vehicle"}{" "}
           <ArrowRight size={16} />
         </button>
       </div>

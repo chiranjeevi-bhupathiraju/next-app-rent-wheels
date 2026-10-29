@@ -1,23 +1,26 @@
 # RentWheels
 
-RentWheels is a frontend vehicle rental marketplace demo. Browse vehicles, submit booking requests, and explore customer, owner, and admin views. The app uses sample listings in INR and stores demo data in your browser; it does not use a backend or provide real authentication or payments.
+RentWheels is a responsive vehicle rental marketplace demo. Visitors can browse sample vehicles, while Customer, Owner, and Admin roles have role-specific dashboards and tools. Sign-in, listings, and bookings are for demonstration only: there is no backend, real authentication, or payment processing.
 
 ## Features
 
-- Browse and search vehicle listings by location, category, price, and availability
+- Start on the marketplace home page when signed out
+- Browse, search, and filter vehicles by category, location, price, and availability
 - View vehicle details and save favorite vehicles
-- Submit and manage demo booking requests
-- Create, edit, and delete owner vehicle listings
-- Upload at least three vehicle photos for new or edited listings
-- Review listings, bookings, and demo users in the admin view
-- Responsive layouts styled with Tailwind CSS
+- Switch between Customer, Owner, and Admin demo roles while signed in
+- Use role-specific dashboards to manage trips, listings, booking requests, and marketplace content
+- Log out to return to the home page
+- Create, edit, and delete vehicle listings
+- Upload 3 to 6 photos for a listing; photos are resized in the browser
+- Validate listing and booking forms before continuing
+- Preserve a valid guest listing or booking form while signing in, then return to the form
+- Use responsive layouts styled with Tailwind CSS
 
 ## Tech stack
 
 - Next.js App Router
 - React 19
 - Tailwind CSS
-- React Hook Form and Zod
 - Lucide React icons
 
 ## Prerequisites
@@ -34,7 +37,7 @@ RentWheels is a frontend vehicle rental marketplace demo. Browse vehicles, submi
    cd next-app-rent-wheels
    ```
 
-2. Install the dependencies:
+2. Install dependencies:
 
    ```bash
    npm install
@@ -48,16 +51,36 @@ RentWheels is a frontend vehicle rental marketplace demo. Browse vehicles, submi
 
    Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## Usage
+## Using the app
 
-1. Browse vehicles from the home page or open **Explore vehicles**.
-2. Search and filter by location, category, price, or availability.
-3. Open a listing to view its details, save it as a favorite, or submit a demo booking request.
-4. Use **Demo account** in the header or visit `/login` to switch between Customer, Owner, and Admin views.
-5. In the Owner view, manage listings and booking requests from `/owner/dashboard`.
-6. In the Admin view, review listings, bookings, and demo user statuses.
+### Browse and book a vehicle
 
-Changes are saved in browser `localStorage` and are cleared if the app's demo data is reset or browser storage is removed. The role selector is for demonstration only. Booking requests do not create real reservations or process payments.
+1. Browse vehicles from the home page or select **Browse vehicles**.
+2. Search or filter listings, then open a vehicle to view its details.
+3. Enter pickup and return dates, your name, and a valid phone number. Notes are optional.
+4. Select **Request booking**. The form validates the dates and required contact details before continuing.
+5. If signed out, enter a valid email and nonblank password on the demo login page. You will return to the booking form with your details preserved. A valid request is then saved as a demo booking.
+
+### List a vehicle
+
+1. Select **List your vehicle** and fill out the listing form.
+2. Enter the required vehicle details and upload at least 3 photos (up to 6).
+3. Select **Add vehicle**. The form validates required fields, daily price, category, and photo count before continuing.
+4. If signed out, sign in on the demo login page. You will return to the listing form with your draft preserved. After adding the vehicle, the form is cleared.
+
+### Demo roles
+
+- **Customer:** Browse rides and view the customer dashboard.
+- **Owner:** Add and manage vehicle listings and review booking requests.
+- **Admin:** Review demo users, vehicle listings, and bookings.
+
+The login page accepts any syntactically valid email address and any nonblank password; it does not verify credentials with a server. When signed in, use the role menu to switch directly between demo roles. Use **Log out** to clear the current role and return to the home page.
+
+## Data and limitations
+
+Marketplace data and the current role are stored in browser `localStorage`. Unfinished listing and booking form drafts are kept in `sessionStorage` so they can be restored after the login redirect in the same browser tab. Clearing browser storage removes the saved demo data.
+
+This project does not provide real accounts, server-side data storage, reservations, or payments. Booking requests are local demo records and should not be treated as confirmed rentals.
 
 ## Available scripts
 
@@ -77,14 +100,14 @@ Starts the production server. Run `npm run build` first.
 
 ```text
 app/
-  [[...slug]]/page.jsx   Route entry point for marketplace pages
+  [[...slug]]/page.jsx   Catch-all route entry point
   globals.css            Global styles and Tailwind directives
   layout.jsx             Root app layout
 src/
-  components/            Vehicle cards, editors, tables, and shared UI
-  screens/               Home, browse, login, dashboard, admin, and detail views
-  data.js                Seeded demo listings and marketplace data
-  Marketplace.jsx        Marketplace state and page composition
-  store.js               Browser localStorage helpers
-  utils.js               Formatting and date utilities
+  components/            Shared UI, vehicle editor, cards, and tables
+  screens/               Home, browse, login, dashboards, and vehicle detail views
+  data.js                Seed demo vehicles and categories
+  Marketplace.jsx        Route selection and marketplace state
+  store.js               Browser localStorage helpers and demo data setup
+  utils.js               Formatting, image, and date utilities
 ```

@@ -1,22 +1,58 @@
 "use client";
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ArrowRight, CalendarDays, Check, ChevronRight, Fuel, MapPin, Star, Users, Zap, ShieldCheck } from 'lucide-react';
 import { Badge, Empty, Image, Price } from '../components/MarketplaceUI';
 import { money, today } from '../utils';
-export function Details({ id, vehicles, bookings, saveBookings, notify }) {
+import { write } from '../store';
+export function Details({ id, vehicles, bookings, saveBookings, notify, role }) {
   const controlClass = "w-full rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100";
   const v = vehicles.find((x) => x.id === id);
+  const bookingDraftKey = `rw_booking_draft_${id}`;
   const [activeImage, setActiveImage] = useState({ vehicleId: null, index: 0 });
+  const [errors, setErrors] = useState({});
   const [pickup, setPickup] = useState(""),
     [returnDate, setReturnDate] = useState(""),
     [name, setName] = useState(""),
     [phone, setPhone] = useState(""),
     [notes, setNotes] = useState("");
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem(bookingDraftKey);
+      if (saved) {
+        const draft = JSON.parse(saved);
+        setPickup(draft.pickup || "");
+        setReturnDate(draft.returnDate || "");
+        setName(draft.name || "");
+        setPhone(draft.phone || "");
+        setNotes(draft.notes || "");
+      }
+    } catch {
+      sessionStorage.removeItem(bookingDraftKey);
+    }
+  }, [bookingDraftKey]);
   const days =
       pickup && returnDate
         ? Math.ceil((new Date(returnDate) - new Date(pickup)) / 86400000)
-        : 0,
+      : 0,
     total = days > 0 ? days * (v?.price || 0) : 0;
+  const goToCustomerLogin = () => {
+    const next = `/vehicles/${encodeURIComponent(id)}`;
+    try {
+      sessionStorage.setItem(
+        bookingDraftKey,
+        JSON.stringify({ pickup, returnDate, name, phone, notes }),
+      );
+    } catch {
+      notify("Your booking details could not be saved. Please try again.");
+      return;
+    }
+    if (role) {
+      write("role", "Customer");
+      window.location.href = next;
+    } else {
+      window.location.href = `/login?role=Customer&next=${encodeURIComponent(next)}`;
+    }
+  };
   if (!v)
     return (
       <main className="mx-auto min-h-[65vh] max-w-7xl px-4 py-10 sm:px-6 sm:py-14">
@@ -38,20 +74,33 @@ export function Details({ id, vehicles, bookings, saveBookings, notify }) {
   const selectedImage = images[selectedImageIndex];
   const submit = (e) => {
     e.preventDefault();
-    if (!pickup || !returnDate || days < 1) {
-      notify("Choose a return date after pickup.");
-      return;
+    const nextErrors = {};
+    const todayDate = new Date(`${today}T00:00:00`);
+    const pickupDate = pickup ? new Date(`${pickup}T00:00:00`) : null;
+    const returnDateValue = returnDate ? new Date(`${returnDate}T00:00:00`) : null;
+    if (!pickup) nextErrors.pickup = "Choose a pickup date.";
+    else if (pickupDate < todayDate) nextErrors.pickup = "Pickup date cannot be in the past.";
+    if (!returnDate) nextErrors.returnDate = "Choose a return date.";
+    else if (pickupDate && returnDateValue <= pickupDate) nextErrors.returnDate = "Return date must be after pickup.";
+    if (!name.trim()) nextErrors.name = "Your name is required.";
+    const trimmedPhone = phone.trim();
+    const phoneDigits = trimmedPhone.replace(/\D/g, "");
+    if (!trimmedPhone) nextErrors.phone = "Your phone number is required.";
+    else if (!/^[+\d\s()-]+$/.test(trimmedPhone) || phoneDigits.length < 10 || phoneDigits.length > 15) {
+      nextErrors.phone = "Enter a valid phone number with 10 to 15 digits.";
     }
-    if (!name.trim() || !phone.trim()) {
-      notify("Add your name and phone number.");
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length) return;
+    if (role !== "Customer") {
+      goToCustomerLogin();
       return;
     }
     const b = {
       id: `BK-${Date.now().toString().slice(-6)}`,
       vehicleId: v.id,
       vehicle: v.name,
-      customer: name,
-      phone,
+      customer: name.trim(),
+      phone: trimmedPhone,
       pickup,
       returnDate,
       days,
@@ -61,10 +110,14 @@ export function Details({ id, vehicles, bookings, saveBookings, notify }) {
       createdAt: new Date().toISOString(),
     };
     saveBookings([b, ...bookings]);
+    sessionStorage.removeItem(bookingDraftKey);
     notify("Booking request sent!");
+    setPickup("");
+    setReturnDate("");
     setName("");
     setPhone("");
     setNotes("");
+    setErrors({});
   };
   return (
     <main className="mx-auto min-h-[65vh] max-w-7xl px-4 py-8 sm:px-6 sm:py-12">
@@ -164,7 +217,7 @@ export function Details({ id, vehicles, bookings, saveBookings, notify }) {
             </div>
             <small className="pt-1 text-xs text-slate-500">per day</small>
           </div>
-          <form onSubmit={submit} className="space-y-4">
+          <form onSubmit={submit} noValidate className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <label className="flex min-w-0 flex-col gap-2">
                 <span className="text-xs font-semibold text-slate-700">Pickup date</span>
@@ -174,8 +227,14 @@ export function Details({ id, vehicles, bookings, saveBookings, notify }) {
                   type="date"
                   min={today}
                   value={pickup}
-                  onChange={(e) => setPickup(e.target.value)}
+                  aria-invalid={Boolean(errors.pickup)}
+                  aria-describedby={errors.pickup ? "pickup-error" : undefined}
+                  onChange={(e) => {
+                    setPickup(e.target.value);
+                    setErrors((current) => ({ ...current, pickup: "", returnDate: "" }));
+                  }}
                 />
+                {errors.pickup && <small id="pickup-error" className="text-xs font-medium text-rose-600">{errors.pickup}</small>}
               </label>
               <label className="flex min-w-0 flex-col gap-2">
                 <span className="text-xs font-semibold text-slate-700">Return date</span>
@@ -185,8 +244,14 @@ export function Details({ id, vehicles, bookings, saveBookings, notify }) {
                   type="date"
                   min={pickup || today}
                   value={returnDate}
-                  onChange={(e) => setReturnDate(e.target.value)}
+                  aria-invalid={Boolean(errors.returnDate)}
+                  aria-describedby={errors.returnDate ? "return-date-error" : undefined}
+                  onChange={(e) => {
+                    setReturnDate(e.target.value);
+                    setErrors((current) => ({ ...current, returnDate: "" }));
+                  }}
                 />
+                {errors.returnDate && <small id="return-date-error" className="text-xs font-medium text-rose-600">{errors.returnDate}</small>}
               </label>
             </div>
             <label className="flex flex-col gap-2">
@@ -196,8 +261,14 @@ export function Details({ id, vehicles, bookings, saveBookings, notify }) {
                 required
                 placeholder="e.g. Jamie Rivera"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                aria-invalid={Boolean(errors.name)}
+                aria-describedby={errors.name ? "name-error" : undefined}
+                onChange={(e) => {
+                  setName(e.target.value);
+                  setErrors((current) => ({ ...current, name: "" }));
+                }}
               />
+              {errors.name && <small id="name-error" className="text-xs font-medium text-rose-600">{errors.name}</small>}
             </label>
             <label className="flex flex-col gap-2">
               <span className="text-xs font-semibold text-slate-700">Phone number</span>
@@ -207,8 +278,14 @@ export function Details({ id, vehicles, bookings, saveBookings, notify }) {
                 type="tel"
                 placeholder="(555) 000-0000"
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                aria-invalid={Boolean(errors.phone)}
+                aria-describedby={errors.phone ? "phone-error" : undefined}
+                onChange={(e) => {
+                  setPhone(e.target.value);
+                  setErrors((current) => ({ ...current, phone: "" }));
+                }}
               />
+              {errors.phone && <small id="phone-error" className="text-xs font-medium text-rose-600">{errors.phone}</small>}
             </label>
             <label className="flex flex-col gap-2">
               <span className="text-xs font-semibold text-slate-700">
@@ -230,7 +307,10 @@ export function Details({ id, vehicles, bookings, saveBookings, notify }) {
               </span>
               <b className="text-base font-bold text-slate-900">{money(total)}</b>
             </div>
-            <button className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 text-sm font-semibold text-white shadow-md shadow-indigo-600/20 transition hover:bg-indigo-700" type="submit">
+            <button
+              className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 text-sm font-semibold text-white shadow-md shadow-indigo-600/20 transition hover:bg-indigo-700"
+              type="submit"
+            >
               Request booking <ArrowRight size={17} />
             </button>
             <div className="flex items-center justify-center gap-2 text-center text-[11px] text-slate-500">

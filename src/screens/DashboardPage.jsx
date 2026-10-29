@@ -1,6 +1,6 @@
 "use client";
 import { useState } from 'react';
-import { ArrowRight, CalendarDays, CarFront, Clock3, Heart, Plus, ShieldCheck, LayoutDashboard, ListChecks, CircleDollarSign, LogOut, Pencil, Trash2, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, CalendarDays, CarFront, Clock3, Compass, Heart, MapPin, Plus, Search, ShieldCheck, Sparkles, LayoutDashboard, ListChecks, CircleDollarSign, LogOut, Pencil, Trash2, CheckCircle2 } from 'lucide-react';
 import { Badge, Empty, Image, PageHead, Price, Stat } from '../components/MarketplaceUI';
 import VehicleCard from '../components/VehicleCard';
 import BookingTable from '../components/BookingTable';
@@ -60,6 +60,7 @@ export function Dashboard({
           ["favorites", "Favorites", Heart],
         ];
   const shownBookings = type === "Customer" ? mine : mine;
+  const heroVehicle = vehicles.find((vehicle) => vehicle.available) || vehicles[0];
   if (editing)
     return (
       <main className="mx-auto min-h-[65vh] max-w-7xl px-4 py-9 sm:px-6 sm:py-14">
@@ -75,6 +76,7 @@ export function Dashboard({
             vehicles={vehicles}
             saveVehicles={saveVehicles}
             notify={notify}
+            role={type}
             onCancel={() => setEditing(null)}
           />
         </div>
@@ -82,31 +84,76 @@ export function Dashboard({
     );
   return (
     <main className="mx-auto max-w-7xl px-4 py-9 sm:px-6 sm:py-14">
-      <div className="mb-8 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
-        <div>
-          <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.16em] text-indigo-600">{type.toUpperCase()} DEMO DASHBOARD</div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-slate-950 sm:text-4xl">
-            {type === "Owner"
-              ? "Your rental workspace"
-              : "Welcome back, traveler"}
-          </h1>
-          <p className="mt-2 text-sm text-slate-500">
-            {type === "Owner"
-              ? "Manage your listings and booking requests."
-              : "Keep an eye on your rides and booking requests."}
-          </p>
+      <section className={`relative mb-8 overflow-hidden rounded-[2rem] text-white shadow-2xl ${type === "Owner" ? "bg-gradient-to-br from-emerald-950 via-teal-900 to-slate-900 shadow-emerald-950/15" : "bg-gradient-to-br from-slate-950 via-indigo-950 to-violet-950 shadow-indigo-950/20"}`}>
+        <div className="absolute -right-24 -top-32 h-80 w-80 rounded-full border border-white/10" />
+        <div className="absolute -right-8 -top-16 h-64 w-64 rounded-full border border-white/10" />
+        <div className="relative grid min-h-[300px] items-center gap-8 p-6 sm:p-9 lg:grid-cols-[1.15fr_.85fr] lg:p-12">
+          <div className="relative z-10 max-w-2xl">
+            <div className="mb-5 flex flex-wrap items-center gap-2">
+              <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.15em] ring-1 ring-inset ${type === "Owner" ? "bg-emerald-400/10 text-emerald-200 ring-emerald-300/20" : "bg-indigo-400/10 text-indigo-200 ring-indigo-300/20"}`}>
+                <Sparkles size={13} /> {type} workspace
+              </span>
+              <span className="text-xs text-white/50">A better trip starts here</span>
+            </div>
+            <h1 className="max-w-xl text-3xl font-black leading-[1.06] tracking-[-0.04em] sm:text-5xl">
+              {type === "Owner" ? "Make every ride count." : "Your next story starts on the road."}
+            </h1>
+            <p className="mt-4 max-w-lg text-sm leading-6 text-white/70 sm:text-base">
+              {type === "Owner"
+                ? "Your rental studio is ready. Keep your fleet polished and turn new requests into great trips."
+                : "Find a ride that fits the plan, save the ones you love, and keep every booking in view."}
+            </p>
+            <div className="mt-7 flex flex-wrap gap-3">
+              {type === "Owner" ? (
+                <>
+                  <button className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-white px-5 text-sm font-bold text-emerald-950 shadow-lg transition hover:-translate-y-0.5 hover:bg-emerald-50" onClick={() => setEditing("new")}>
+                    <Plus size={17} /> Add a vehicle <ArrowUpRight size={16} />
+                  </button>
+                  <button className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-5 text-sm font-semibold text-white transition hover:bg-white/10" onClick={() => setTab("requests")}>
+                    <ListChecks size={16} /> View requests
+                  </button>
+                </>
+              ) : (
+                <>
+                  <a className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-white px-5 text-sm font-bold text-indigo-950 shadow-lg transition hover:-translate-y-0.5 hover:bg-indigo-50" href="/vehicles">
+                    <Search size={17} /> Find your ride <ArrowUpRight size={16} />
+                  </a>
+                  <button className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-5 text-sm font-semibold text-white transition hover:bg-white/10" onClick={() => setTab("bookings")}>
+                    <CalendarDays size={16} /> My trips
+                  </button>
+                </>
+              )}
+            </div>
+            <div className="mt-7 flex flex-wrap gap-x-6 gap-y-2 text-xs font-medium text-white/55">
+              <span className="inline-flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-emerald-300" /> {type === "Owner" ? `${ownerVehicles.length} vehicles in your fleet` : `${shownBookings.length} trips on your account`}</span>
+              <span className="inline-flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-sky-300" /> Demo workspace</span>
+            </div>
+          </div>
+          <div className="relative hidden h-[230px] overflow-hidden rounded-[1.5rem] border border-white/15 bg-white/5 lg:block">
+            {heroVehicle && <Image src={heroVehicle.image} alt={heroVehicle.name} className="absolute inset-0 h-full w-full object-cover opacity-80" />}
+            <div className={`absolute inset-0 ${type === "Owner" ? "bg-gradient-to-r from-emerald-950 via-emerald-950/30 to-transparent" : "bg-gradient-to-r from-indigo-950 via-indigo-950/25 to-transparent"}`} />
+            <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5">
+              <div>
+                <span className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-black/30 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur"><MapPin size={11} /> {heroVehicle?.location || "Your next destination"}</span>
+                <h2 className="text-xl font-extrabold tracking-tight">{type === "Owner" ? "Your fleet, in motion." : heroVehicle?.name || "The open road awaits."}</h2>
+                <p className="mt-1 text-xs text-white/70">{type === "Owner" ? "Your vehicle listings at a glance" : "A great ride for the plans ahead"}</p>
+              </div>
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-white/20 bg-white/10 backdrop-blur"><Compass size={20} /></span>
+            </div>
+          </div>
         </div>
         <button
-          className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:border-indigo-200 hover:bg-indigo-50"
+          aria-label="Log out"
+          title="Log out"
+          className="absolute right-5 top-5 inline-flex h-9 items-center gap-2 rounded-full border border-white/15 bg-black/10 px-3 text-[11px] font-semibold text-white/75 transition hover:bg-white/10 hover:text-white sm:right-8 sm:top-7"
           onClick={() => {
             write("role", null);
-            window.location.href = "/login";
+            window.location.href = "/";
           }}
         >
-          <LogOut size={16} />
-          Switch role
+          <LogOut size={14} /> Log out
         </button>
-      </div>
+      </section>
       <div className="grid items-start gap-6 lg:grid-cols-[230px_minmax(0,1fr)]">
         <aside className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
           <div className="mb-4 flex items-center gap-3 border-b border-slate-100 pb-4">
