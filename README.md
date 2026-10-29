@@ -2,6 +2,8 @@
 
 RentWheels is a responsive vehicle rental marketplace for exploring and managing vehicle rentals. Customers can find rides, save favorites, and manage booking requests; Owners can list vehicles and handle rental requests; Admins can review marketplace listings, bookings, and users.
 
+![RentWheels home page](docs/rentwheels-home.png)
+
 ## Features
 
 - Start on the marketplace home page when signed out
