@@ -1,6 +1,6 @@
 # RentWheels
 
-RentWheels is a responsive vehicle rental marketplace demo. Visitors can browse sample vehicles, while Customer, Owner, and Admin roles have role-specific dashboards and tools. Sign-in, listings, and bookings are for demonstration only: there is no backend, real authentication, or payment processing.
+RentWheels is a responsive vehicle rental marketplace for exploring and managing vehicle rentals. Customers can find rides, save favorites, and manage booking requests; Owners can list vehicles and handle rental requests; Admins can review marketplace listings, bookings, and users.
 
 ## Features
 
