@@ -10,6 +10,13 @@ export function Home({ vehicles, favorites, toggleFavorite }) {
     [category, setCategory] = useState(""),
     [pickup, setPickup] = useState(""),
     [returnDate, setReturnDate] = useState("");
+  const openDatePicker = (event) => {
+    const dateInput = event.currentTarget.querySelector('input[type="date"]');
+    if (typeof dateInput?.showPicker === "function") {
+      event.preventDefault();
+      dateInput.showPicker();
+    }
+  };
   const submit = (e) => {
     e.preventDefault();
     const q = new URLSearchParams();
@@ -68,7 +75,11 @@ export function Home({ vehicles, favorites, toggleFavorite }) {
               src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1600&q=90"
               alt="Blue sports car on a scenic road"
             />
-            <div className="absolute bottom-5 left-3 z-10 flex items-center gap-3 rounded-2xl border border-slate-100 bg-white p-3 shadow-xl sm:bottom-7 sm:left-[-18px] sm:p-4">
+            <a
+              className="absolute bottom-5 left-3 z-10 flex items-center gap-3 rounded-2xl border border-slate-100 bg-white p-3 shadow-xl transition hover:-translate-y-0.5 hover:shadow-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:bottom-7 sm:left-[-18px] sm:p-4"
+              href="/vehicles"
+              aria-label="Find your next favorite — browse rides near you"
+            >
               <span className="grid h-10 w-10 place-items-center rounded-xl bg-amber-50 text-amber-500">
                 <Star size={17} fill="currentColor" />
               </span>
@@ -77,7 +88,7 @@ export function Home({ vehicles, favorites, toggleFavorite }) {
                 <small className="text-[10px] text-slate-500">Browse rides near you</small>
               </div>
               <ChevronRight size={18} />
-            </div>
+            </a>
             <div className="absolute bottom-5 right-5 z-10 grid text-right text-white drop-shadow sm:bottom-7 sm:right-7">
               <b className="text-3xl font-extrabold">12+</b>
               <span className="text-xs text-white/85">rides to explore</span>
@@ -115,7 +126,7 @@ export function Home({ vehicles, favorites, toggleFavorite }) {
               ))}
             </select>
           </label>
-          <label className="grid gap-1 rounded-xl px-3 py-2.5">
+          <label className="grid cursor-pointer gap-1 rounded-xl px-3 py-2.5" onClick={openDatePicker}>
             <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wide text-slate-500">
               <CalendarDays className="text-indigo-600" size={15} />
               Pickup date
@@ -128,7 +139,7 @@ export function Home({ vehicles, favorites, toggleFavorite }) {
               onChange={(e) => setPickup(e.target.value)}
             />
           </label>
-          <label className="grid gap-1 rounded-xl px-3 py-2.5">
+          <label className="grid cursor-pointer gap-1 rounded-xl px-3 py-2.5" onClick={openDatePicker}>
             <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wide text-slate-500">
               <CalendarDays className="text-indigo-600" size={15} />
               Return date

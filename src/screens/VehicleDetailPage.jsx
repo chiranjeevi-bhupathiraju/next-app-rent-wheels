@@ -53,6 +53,13 @@ export function Details({ id, vehicles, bookings, saveBookings, notify, role }) 
       window.location.href = `/login?role=Customer&next=${encodeURIComponent(next)}`;
     }
   };
+  const openDatePicker = (event) => {
+    const dateInput = event.currentTarget.querySelector('input[type="date"]');
+    if (typeof dateInput?.showPicker === "function") {
+      event.preventDefault();
+      dateInput.showPicker();
+    }
+  };
   if (!v)
     return (
       <main className="mx-auto min-h-[65vh] max-w-7xl px-4 py-10 sm:px-6 sm:py-14">
@@ -231,7 +238,7 @@ export function Details({ id, vehicles, bookings, saveBookings, notify, role }) 
               </p>
             )}
             <div className="grid grid-cols-2 gap-3">
-              <label className="flex min-w-0 flex-col gap-2">
+              <label className="flex min-w-0 cursor-pointer flex-col gap-2" onClick={openDatePicker}>
                 <span className="text-xs font-semibold text-slate-700">Pickup date</span>
                 <input
                   className={controlClass}
@@ -248,7 +255,7 @@ export function Details({ id, vehicles, bookings, saveBookings, notify, role }) 
                 />
                 {errors.pickup && <small id="pickup-error" className="text-xs font-medium text-rose-600">{errors.pickup}</small>}
               </label>
-              <label className="flex min-w-0 flex-col gap-2">
+              <label className="flex min-w-0 cursor-pointer flex-col gap-2" onClick={openDatePicker}>
                 <span className="text-xs font-semibold text-slate-700">Return date</span>
                 <input
                   className={controlClass}
