@@ -5,7 +5,14 @@ export const metadata = {
 };
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try { document.documentElement.dataset.theme = localStorage.getItem("rentwheels-theme") === "dark" ? "dark" : "light"; } catch (_) {}`,
+          }}
+        />
+      </head>
       <body className="overflow-y-scroll font-sans">{children}</body>
     </html>
   );

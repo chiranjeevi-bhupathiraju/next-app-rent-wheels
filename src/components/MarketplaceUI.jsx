@@ -1,6 +1,6 @@
 "use client";
 import { useState } from 'react';
-import { ArrowRight, CarFront, ChevronDown, LogOut, Menu, X } from 'lucide-react';
+import { ArrowRight, CarFront, ChevronDown, LogOut, Menu, Moon, Sun, X } from 'lucide-react';
 import { write } from '../store';
 import { imageFallback, money } from '../utils';
 function Image({ src, alt, className = "" }) {
@@ -34,7 +34,7 @@ function Price({ value, suffix = "/ day" }) {
     </span>
   );
 }
-function Header({ role, path = "/", query = "" }) {
+function Header({ role, path = "/", query = "", theme = "light", toggleTheme }) {
   const [open, setOpen] = useState(false),
     [mobile, setMobile] = useState(false);
   const currentCategory = new URLSearchParams(query).get("category");
@@ -80,6 +80,15 @@ function Header({ role, path = "/", query = "" }) {
           })}
         </nav>
         <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={toggleTheme}
+            aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
+            title={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
+            className="grid h-10 w-10 place-items-center rounded-xl border border-slate-200 bg-white text-slate-700 transition hover:bg-slate-50"
+          >
+            {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
           {role ? <div className="relative">
             <button
               type="button"

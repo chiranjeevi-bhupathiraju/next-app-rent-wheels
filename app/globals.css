@@ -9,6 +9,13 @@
   --muted: #64748b;
   --border: #e2e8f0;
 }
+[data-theme="dark"] {
+  color-scheme: dark;
+  --navy: #f1f5f9;
+  --text: #e2e8f0;
+  --muted: #94a3b8;
+  --border: #334155;
+}
 * {
   box-sizing: border-box;
 }
@@ -22,6 +29,45 @@ body {
   font-size: 15px;
   -webkit-font-smoothing: antialiased;
 }
+[data-theme="dark"] body {
+  background: #0b1220;
+  color: var(--text);
+}
+[data-theme="dark"] .bg-white,
+[data-theme="dark"] .bg-white\/90,
+[data-theme="dark"] .bg-white\/95 { background-color: #111c2e; }
+[data-theme="dark"] .bg-slate-50,
+[data-theme="dark"] .bg-slate-50\/80 { background-color: #0f1a2b; }
+[data-theme="dark"] .bg-slate-100 { background-color: #1e293b; }
+[data-theme="dark"] .bg-slate-200 { background-color: #334155; }
+[data-theme="dark"] .text-slate-950,
+[data-theme="dark"] .text-slate-900 { color: #f8fafc; }
+[data-theme="dark"] .text-slate-800,
+[data-theme="dark"] .text-slate-700 { color: #e2e8f0; }
+[data-theme="dark"] .text-slate-600,
+[data-theme="dark"] .text-slate-500 { color: #a8b6c9; }
+[data-theme="dark"] .text-slate-400 { color: #94a3b8; }
+[data-theme="dark"] .border-slate-100,
+[data-theme="dark"] .border-slate-200,
+[data-theme="dark"] .border-slate-200\/80,
+[data-theme="dark"] .border-slate-300 { border-color: #334155; }
+[data-theme="dark"] .divide-slate-100 > :not([hidden]) ~ :not([hidden]) { border-color: #334155; }
+[data-theme="dark"] .hover\:bg-slate-50:hover { background-color: #1e293b; }
+[data-theme="dark"] .hover\:bg-slate-100:hover { background-color: #334155; }
+[data-theme="dark"] .table-card,
+[data-theme="dark"] .icon-button,
+[data-theme="dark"] .admin-filter { background-color: #111c2e; }
+[data-theme="dark"] .table-head { border-color: #263449; }
+[data-theme="dark"] th { background-color: #0f1a2b; }
+[data-theme="dark"] td,
+[data-theme="dark"] .owner-row { border-color: #263449; }
+[data-theme="dark"] td { color: #cbd5e1; }
+[data-theme="dark"] .reset-card { border-color: #334155; }
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea { color-scheme: dark; }
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder { color: #94a3b8; }
 button,   
 input,   
 select,   

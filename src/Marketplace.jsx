@@ -18,6 +18,7 @@ export default function Marketplace({ path, query }) {
     [bookings, setBookings] = useState([]),
     [favorites, setFavorites] = useState([]),
     [users, setUsers] = useState([]),
+    [theme, setTheme] = useState("light"),
     [toast, setToast] = useState("");
   const segment = path.split("/").filter(Boolean);
   const refresh = () => {
@@ -29,10 +30,20 @@ export default function Marketplace({ path, query }) {
   useEffect(() => {
     initStore();
     refresh();
+    const savedTheme = localStorage.getItem("rentwheels-theme");
+    const initialTheme = savedTheme === "dark" ? "dark" : "light";
+    setTheme(initialTheme);
+    document.documentElement.dataset.theme = initialTheme;
     const savedRole = read("role", null);
     setRole(["Customer", "Owner", "Admin"].includes(savedRole) ? savedRole : null);
     setRoleReady(true);
   }, []);
+  const toggleTheme = () => {
+    const nextTheme = theme === "dark" ? "light" : "dark";
+    setTheme(nextTheme);
+    document.documentElement.dataset.theme = nextTheme;
+    localStorage.setItem("rentwheels-theme", nextTheme);
+  };
   const routeRole = segment[0] === "customer"
     ? "Customer"
     : segment[0] === "owner" || segment[0] === "list-vehicle"
@@ -82,7 +93,7 @@ export default function Marketplace({ path, query }) {
   }
   return (
     <>
-      <Header role={role} path={path} query={query} />
+      <Header role={role} path={path} query={query} theme={theme} toggleTheme={toggleTheme} />
       {segment[0] === "vehicles" && segment[1] ? (
         <VehicleDetailPage
           id={segment[1]}
