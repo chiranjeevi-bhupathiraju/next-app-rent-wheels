@@ -1,6 +1,6 @@
 import "./globals.css";
 export const metadata = {
-  title: "RentWheels — Find your perfect ride",
+  title: "RentWheels",
   description: "Browse cars, bikes and more with RentWheels.",
 };
 export default function RootLayout({ children }) {
